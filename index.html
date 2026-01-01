@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker New Year 2026</title>
+    <meta name="description" content="Enter the matrix for a cyberpunk Happy New Year 2026 greeting.">
+    <meta property="og:title" content="Hacker New Year 2026">
+    <meta property="og:description" content="Dive into the future with a hacker-style New Year greeting.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/yourusername/yourrepo/main/preview.jpg"> <!-- Replace with actual static image URL hosted on GitHub or elsewhere -->
+    <meta property="og:url" content="https://yourusername.github.io/yourrepo/"> <!-- Replace with your GitHub Pages URL -->
+    <meta property="og:type" content="website">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .terminal {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #00ff00;
+            text-align: left;
+            font-size: 1.2em;
+            line-height: 1.5;
+            position: relative;
+        }
+        .terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.1) 2px,
+                rgba(0, 255, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            animation: scanline 0.1s linear infinite;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .glitch {
+            animation: glitch 0.5s infinite;
+            text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        .flicker {
+            animation: flicker 2s infinite;
+        }
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        input {
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 5px;
+            font-family: inherit;
+            font-size: inherit;
+        }
+        button {
+            background: #00ff00;
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .reveal {
+            font-size: 2em;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .share {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .preview-canvas {
+            display: none;
+            margin-top: 20px;
+            border: 2px solid #00ff00;
+        }
+        @media (max-width: 768px) {
+            .terminal {
+                font-size: 1em;
+                padding: 10px;
+            }
+            .reveal {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="terminal" id="terminal">
+        <div id="output"></div>
+        <div id="input-section" style="display: none;">
+            > ENTER YOUR NAME: <input type="text" id="name-input" maxlength="20"><button id="execute-btn">EXECUTE</button>
+        </div>
+        <div id="reveal-section" style="display: none;">
+            <div class="reveal flicker">
+                <div class="glitch">HAPPY NEW YEAR 2026</div>
+                <div id="user-name"></div>
+                <p>Welcome to the future<br>May your code compile and dreams execute</p>
+            </div>
+            <canvas id="preview-canvas" class="preview-canvas" width="1200" height="630"></canvas>
+            <button id="download-btn" style="display: none;">DOWNLOAD PREVIEW IMAGE</button>
+            <div class="share">
+                <button id="whatsapp-btn">SHARE ON WHATSAPP</button>
+                <button id="copy-link-btn">COPY LINK</button>
+            </div>
+            <p style="font-size: 0.8em; margin-top: 10px;">Note: Social platforms require a static OG image for previews. Download and share the generated image manually for full effect.</p>
+        </div>
+    </div>
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const matrixChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 35);
+
+        // Typing animation function
+        function typeText(element, text, callback) {
+            let i = 0;
+            const interval = setInterval(() => {
+                element.innerHTML += text.charAt(i);
+                i++;
+                if (i >= text.length) {
+                    clearInterval(interval);
+                    if (callback) callback();
+                }
+            }, 50);
+        }
+
+        // Get URL parameter
+        function getParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Main flow
+        const output = document.getElementById('output');
+        const inputSection = document.getElementById('input-section');
+        const revealSection = document.getElementById('reveal-section');
+        const nameInput = document.getElementById('name-input');
+        const executeBtn = document.getElementById('execute-btn');
+        const userNameDiv = document.getElementById('user-name');
+        const previewCanvas = document.getElementById('preview-canvas');
+        const downloadBtn = document.getElementById('download-btn');
+        const whatsappBtn = document.getElementById('whatsapp-btn');
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+
+        let userName = getParam('name') || '';
+
+        // Boot sequence
+        const bootMessages = [
+            'Initializing protocol...<br>',
+            'Connecting to 2026 server...<br>',
+            'Decrypting future...<br>',
+            'Access ready...<br>'
+        ];
+        let msgIndex = 0;
+        function nextBoot() {
+            if (msgIndex < bootMessages.length) {
+                typeText(output, bootMessages[msgIndex], nextBoot);
+                msgIndex++;
+            } else {
+                inputSection.style.display = 'block';
+                if (userName) {
+                    nameInput.value = userName;
+                    executeBtn.click();
+                }
+            }
+        }
+        nextBoot();
+
+        // Execute button
+        executeBtn.addEventListener('click', () => {
+            userName = nameInput.value.trim() || 'Anonymous';
+            inputSection.style.display = 'none';
+            const processingMessages = [
+                'Name detected: ' + userName + '<br>',
+                'Compiling New Year message...<br>',
+                'Access Granted ✔<br>'
+            ];
+            let procIndex = 0;
+            function nextProc() {
+                if (procIndex < processingMessages.length) {
+                    typeText(output, processingMessages[procIndex], nextProc);
+                    procIndex++;
+                } else {
+                    setTimeout(() => {
+                        revealSection.style.display = 'block';
+                        userNameDiv.innerHTML = '&gt;&gt;&gt; ' + userName + ' &lt;&lt;&lt;';
+                        generatePreview();
+                    }, 1000);
+                }
+            }
+            nextProc();
+        });
+
+        // Generate preview image
+        function generatePreview() {
+            const pCtx = previewCanvas.getContext('2d');
+            pCtx.fillStyle = '#000';
+            pCtx.fillRect(0, 0, 1200, 630);
+            pCtx.fillStyle = '#00ff00';
+            pCtx.font = 'bold 60px monospace';
+            pCtx.textAlign = 'center';
+            pCtx.fillText('HAPPY NEW YEAR 2026', 600, 200);
+            pCtx.fillText(userName, 600, 300);
+            pCtx.fillText('Welcome to the future', 600, 400);
+            pCtx.fillText('May your code compile and dreams execute', 600, 500);
+            previewCanvas.style.display = 'block';
+            downloadBtn.style.display = 'block';
+        }
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'happy-new-year-2026.png';
+            link.href = previewCanvas.toDataURL();
+            link.click();
+        });
+
+        // WhatsApp share
+        whatsappBtn.addEventListener('click', () => {
+            const url = encodeURIComponent(window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(userName));
+            const text = encodeURIComponent('Check out this hacker New Year greeting: ' + url);
+            window.open('https://wa.me/?text=' + text, '_blank');
+        });
+
+        // Copy link
+        copyLinkBtn.addEventListener('click', () => {
+            const url = window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(userName);
+            navigator.clipboard.writeText(url).then(() => alert('Link copied!'));
+        });
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+  </html>

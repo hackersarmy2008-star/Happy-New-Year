@@ -1,40 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker New Year 2026</title>
-    <meta name="description" content="Enter the matrix for a cyberpunk Happy New Year 2026 greeting.">
-    <meta property="og:title" content="Hacker New Year 2026">
-    <meta property="og:description" content="Dive into the future with a hacker-style New Year greeting.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/yourusername/yourrepo/main/preview.jpg"> <!-- Replace with actual static image URL hosted on GitHub or elsewhere -->
-    <meta property="og:url" content="https://yourusername.github.io/yourrepo/"> <!-- Replace with your GitHub Pages URL -->
-    <meta property="og:type" content="website">
-    <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #00ff00;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            position: relative;
-        }
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacker New Year 2026</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:'Courier New',monospace;
+    background:#000;
+    color:#00ff00;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+canvas#matrix{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+}
+
+.terminal{
+    width:95%;
+    max-width:820px;
+    background:rgba(0,0,0,.85);
+    border:2px solid #00ff00;
+    border-radius:12px;
+    padding:16px;
+    box-shadow:0 0 25px #00ff00;
+    font-size:1.1rem;
+    line-height:1.5;
+}
+
+@media(max-width:600px){
+    .terminal{font-size:.95rem;padding:12px}
+}
+
+.cursor{animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+
+.glitch{
+    animation:glitch .4s infinite;
+    text-shadow:2px 2px red,-2px -2px blue;
+}
+@keyframes glitch{
+    0%{transform:translate(0)}
+    25%{transform:translate(-2px,2px)}
+    50%{transform:translate(2px,-2px)}
+    75%{transform:translate(-2px,-2px)}
+}
+
+input,button{
+    background:#000;
+    border:1px solid #00ff00;
+    color:#00ff00;
+    padding:6px 10px;
+    font-family:inherit;
+    font-size:inherit;
+}
+
+button{
+    cursor:pointer;
+    background:#00ff00;
+    color:#000;
+    margin-left:8px;
+}
+
+.reveal{
+    text-align:center;
+    margin-top:20px;
+}
+
+.share{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-top:15px;
+}
+
+footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:.75rem;
+    opacity:.8;
+}
+
+.logo{
+    width:80px;
+    margin:0 auto 10px;
+    display:block;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<!-- SOUND EFFECTS -->
+<audio id="typeSound" src="typing.mp3" preload="auto"></audio>
+<audio id="glitchSound" src="glitch.mp3" preload="auto"></audio>
+
+<div class="terminal">
+
+<img src="logo.png" class="logo" alt="Logo">
+
+<div id="output"></div>
+
+<div id="input-section" style="display:none;margin-top:10px">
+&gt; ENTER YOUR NAME:
+<input id="name-input" maxlength="20">
+<button id="execute-btn">EXECUTE</button>
+</div>
+
+<div id="reveal-section" style="display:none">
+    <div class="reveal">
+        <div class="glitch">HAPPY NEW YEAR 2026</div>
+        <div id="user-name"></div>
+        <p>Welcome to the future<br>May your code compile and dreams execute</p>
+    </div>
+
+    <div class="share">
+        <button id="whatsapp-btn">SHARE ON WHATSAPP</button>
+        <button id="copy-link-btn">COPY LINK</button>
+    </div>
+
+    <footer>
+        Created by <b>Priyanshu Shaw</b>
+    </footer>
+</div>
+
+</div>
+
+<script>
+// MATRIX EFFECT
+const canvas=document.getElementById("matrix"),
+ctx=canvas.getContext("2d");
+function resize(){
+canvas.width=innerWidth;canvas.height=innerHeight}
+resize();addEventListener("resize",resize);
+
+const chars="01ABCDEFGHIJKLMNOPQRSTUVWXYZ@$%";
+const drops=Array(Math.floor(canvas.width/16)).fill(1);
+function draw(){
+ctx.fillStyle="rgba(0,0,0,.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#00ff00";
+ctx.font="16px monospace";
+drops.forEach((y,i)=>{
+const text=chars[Math.floor(Math.random()*chars.length)];
+ctx.fillText(text,i*16,y*16);
+drops[i]=y*16>canvas.height&&Math.random()>0.975?0:y+1;
+});
+}
+setInterval(draw,35);
+
+// SOUNDS
+const typeSound=document.getElementById("typeSound");
+const glitchSound=document.getElementById("glitchSound");
+
+function playType(){
+typeSound.currentTime=0;
+typeSound.play().catch(()=>{});
+}
+
+// TYPE EFFECT
+function typeText(el,text,cb){
+let i=0;
+const t=setInterval(()=>{
+el.innerHTML+=text.charAt(i);
+playType();
+i++;
+if(i>=text.length){clearInterval(t);cb&&cb();}
+},40);
+}
+
+// FLOW
+const output=document.getElementById("output");
+const inputSection=document.getElementById("input-section");
+const reveal=document.getElementById("reveal-section");
+const userNameDiv=document.getElementById("user-name");
+
+const boot=[
+"Initializing protocol...<br>",
+"Connecting to 2026 server...<br>",
+"Decrypting future...<br>",
+"Access ready ✔<br>"
+];
+
+let b=0;
+(function bootSeq(){
+if(b<boot.length){
+typeText(output,boot[b++],bootSeq);
+}else inputSection.style.display="block";
+})();
+
+document.getElementById("execute-btn").onclick=()=>{
+const name=document.getElementById("name-input").value||"Anonymous";
+inputSection.style.display="none";
+typeText(output,`Name detected: ${name}<br>Compiling...<br>`,()=>{
+glitchSound.play().catch(()=>{});
+setTimeout(()=>{
+reveal.style.display="block";
+userNameDiv.innerHTML=`>>> ${name} <<<`;
+},700);
+});
+};
+
+// SHARE
+document.getElementById("whatsapp-btn").onclick=()=>{
+const url=location.href.split("?")[0]+"?name="+encodeURIComponent(userNameDiv.innerText);
+window.open("https://wa.me/?text="+encodeURIComponent(url));
+};
+
+document.getElementById("copy-link-btn").onclick=()=>{
+navigator.clipboard.writeText(location.href);
+alert("Link copied");
+};
+</script>
+
+</body>
+</html>        }
         .terminal {
             width: 90%;
             max-width: 800px;
